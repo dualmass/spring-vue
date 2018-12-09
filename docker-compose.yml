@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+
+        backend:
+                image: deyvedvm/spring-vue-backend
+                build: backend/.
+                ports: 
+                        - 8090:8090
+
+        client:
+                image: deyvedvm/spring-vue-frontend
+                build: frontend/.
+                
+                ports: 
+                        - 8080:8080
+
+        
