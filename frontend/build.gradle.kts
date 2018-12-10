@@ -1,6 +1,7 @@
 import com.moowork.gradle.node.npm.NpmTask
 import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.task.NodeTask
+import com.sun.deploy.config.JREInfo.setArgs
 
 description = """ `frontend` module (frontend, vue.js) """
 
@@ -23,39 +24,40 @@ buildscript {
 repositories { jcenter() }
 dependencies { }
 
-//jar.dependsOn 'npm_run_build'
 
 tasks {
-    val runFrontEnd by registering(NpmTask::class) {
+    val backendFolder = "../backend"
+
+    val npmRunServe by registering(NpmTask::class) {
+        group = "Npm"
         setArgs(listOf("run", "serve"))
+        project.logger.info(">>> `npm INSTALL` is done ")
     }
 
-    val dist by registering(Copy::class) {
-        group = "Distribut"
-        from(file("dist"))
-        into("../backend/resources/public")
-        doLast {
-            println(">>> Ok. Frontend files from have copied.<<<")
-            finalizedBy(runFrontEnd)
-        }
-    }
-    
-    create<NpmTask>("npmBuild") {
-        group = "Node"
-        description = " Run commands: ``npm run build` & `npm run build` "
-        dependsOn("npmInstall")
+    val npmBuild by registering(NpmTask::class) {
+        group = "Npm"
         setArgs(listOf("run", "build"))
-        finalizedBy(dist)
-        doLast { println(">>> Ok. Frontend `run build` is done.") }
+        doLast { project.logger.info(">>> `npm run BUILD` is done.") }
     }
 
+    val npmInstall by existing(NpmTask::class) {
+        group = "Npm"
+        finalizedBy(npmBuild)
+        project.logger.info(">>> `npm INSTALL` is done ")
+    }
 
-    val npmClean by registering(Delete::class) {
-        val webDir = "../frontend"
-        delete("${webDir}/node")
-        delete("$webDir/node_modules")
-        delete("$webDir/dist")
-        delete("../backend/src/main/resources/public")
+    val copyToBackendAndRun by registering(Copy::class) {
+        group = "Npm"
+        from(file("dist"))
+        into("$backendFolder/public")
+        finalizedBy(npmRunServe)
+        project.logger.info(">>> Frontend dist folder succesfully copied. ")
+    }
+
+    val clean by registering(Delete::class) {
+        group = "Npm"
+        delete("node"); delete("dist")
+        delete("node_modules"); delete("$backendFolder/src/main/public")
     }
 }
 

@@ -76,18 +76,15 @@ sourceSets {
 }
 
 tasks {
-    val buildFrontEndTask by registering(Exec::class) {
-        val gradleCommandFromFrontendModule = "dist"
-        workingDir("../frontend")
-        commandLine("cmd", "/c", "gradle", gradleCommandFromFrontendModule)
+    val frontenFolder = "../frontend"
+    
+    val buildFrontend by registering(Exec::class) {
+        val gradleCommandFromFrontendModule = "npmRunServe"
+        workingDir(frontenFolder)
+        if (System.getProperty("os.name").toLowerCase().contains("windows"))
+            commandLine("cmd", "/c", "gradle", gradleCommandFromFrontendModule)
+        else commandLine("gradle", gradleCommandFromFrontendModule)
     }
-
-    val bootJar by existing { finalizedBy(buildFrontEndTask) }
-
-//    val build by existing { finalizedBy(buildFrontEndTask) }
-
-    distTar { enabled = false }
-    distZip { enabled = false }
 
     getByName<Test>("test") {
         useJUnitPlatform {
@@ -96,9 +93,13 @@ tasks {
         }
     }
 
-    processResources {
-        from ("../frontend/dist/") {
-            into ("public")
+    val jar by existing {
+        dependsOn(buildFrontend)
+        copy {
+            from(file("$frontenFolder/dist"))
+            into("public")
         }
     }
+
 }
+
