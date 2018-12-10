@@ -7,6 +7,10 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
+  "proxy": {
+    "target": "http://localhost:8090",
+    "ws": true
+  },
   "dependencies": {
     "bulma": "^0.7.1",
     "vue": "^2.5.17"

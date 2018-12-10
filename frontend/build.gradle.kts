@@ -2,9 +2,10 @@ import com.moowork.gradle.node.npm.NpmTask
 import com.moowork.gradle.node.NodeExtension
 import com.moowork.gradle.node.task.NodeTask
 
-description = """ `client` module (frontend, vue.js) """
+description = """ `frontend` module (frontend, vue.js) """
 
 plugins {
+    //    java
     id("com.moowork.node") version "1.2.0"
 }
 
@@ -22,16 +23,29 @@ buildscript {
 repositories { jcenter() }
 dependencies { }
 
+//jar.dependsOn 'npm_run_build'
+
 tasks {
-    val inputVueJsCompiledFolder = "/target/dist"
-    val outBackendDir = "/build/resources/custom-ui/"
+    val inputVueJsCompiledFolder = "dist"
+    val outBackendDir = "/build/static"
+
 
     val dist by registering(Copy::class) {
         group = "Distribut"
         description = """ Makes copy of $inputVueJsCompiledFolder folder into $outBackendDir of `server` module. """
+        dependsOn("npm_run_build")
         from(file(inputVueJsCompiledFolder))
-        into(file("../server/$outBackendDir"))
+        into("static")
+//        into(file("../backend/$outBackendDir"))
         doLast { println(">>> Ok. Frontend files from $inputVueJsCompiledFolder have copied.<<<") }
+    }
+
+    val npmClean by registering(Delete::class) {
+        val webDir = "${rootDir}/frontend"
+        delete("${webDir}/node")
+        delete("$webDir/node_modules")
+        delete("$webDir/dist")
+        delete("$rootDir/backend/src/main/resources/public")
     }
 
     create<NpmTask>("npmBuild") {
