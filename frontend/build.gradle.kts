@@ -26,28 +26,20 @@ dependencies { }
 //jar.dependsOn 'npm_run_build'
 
 tasks {
-    val inputVueJsCompiledFolder = "dist"
-    val outBackendDir = "/build/static"
-
+    val runFrontEnd by registering(NpmTask::class) {
+        setArgs(listOf("run", "serve"))
+    }
 
     val dist by registering(Copy::class) {
         group = "Distribut"
-        description = """ Makes copy of $inputVueJsCompiledFolder folder into $outBackendDir of `server` module. """
-        dependsOn("npm_run_build")
-        from(file(inputVueJsCompiledFolder))
-        into("static")
-//        into(file("../backend/$outBackendDir"))
-        doLast { println(">>> Ok. Frontend files from $inputVueJsCompiledFolder have copied.<<<") }
+        from(file("dist"))
+        into("../backend/resources/public")
+        doLast {
+            println(">>> Ok. Frontend files from have copied.<<<")
+            finalizedBy(runFrontEnd)
+        }
     }
-
-    val npmClean by registering(Delete::class) {
-        val webDir = "${rootDir}/frontend"
-        delete("${webDir}/node")
-        delete("$webDir/node_modules")
-        delete("$webDir/dist")
-        delete("$rootDir/backend/src/main/resources/public")
-    }
-
+    
     create<NpmTask>("npmBuild") {
         group = "Node"
         description = " Run commands: ``npm run build` & `npm run build` "
@@ -55,6 +47,15 @@ tasks {
         setArgs(listOf("run", "build"))
         finalizedBy(dist)
         doLast { println(">>> Ok. Frontend `run build` is done.") }
+    }
+
+
+    val npmClean by registering(Delete::class) {
+        val webDir = "../frontend"
+        delete("${webDir}/node")
+        delete("$webDir/node_modules")
+        delete("$webDir/dist")
+        delete("../backend/src/main/resources/public")
     }
 }
 

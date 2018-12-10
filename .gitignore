@@ -25,5 +25,4 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
-/.idea/
-.idea/
+

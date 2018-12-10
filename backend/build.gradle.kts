@@ -76,15 +76,15 @@ sourceSets {
 }
 
 tasks {
-
     val buildFrontEndTask by registering(Exec::class) {
-        val gradleCommandFromFrontendModule = "npmInstall"
+        val gradleCommandFromFrontendModule = "dist"
         workingDir("../frontend")
         commandLine("cmd", "/c", "gradle", gradleCommandFromFrontendModule)
-        doLast { println("+++ Frontend has built successful after server build +++") }
     }
 
-    val build by existing { finalizedBy(buildFrontEndTask) }
+    val bootJar by existing { finalizedBy(buildFrontEndTask) }
+
+//    val build by existing { finalizedBy(buildFrontEndTask) }
 
     distTar { enabled = false }
     distZip { enabled = false }
@@ -93,6 +93,12 @@ tasks {
         useJUnitPlatform {
             includeEngines("junit-jupiter")
             excludeEngines("junit-vintage")
+        }
+    }
+
+    processResources {
+        from ("../frontend/dist/") {
+            into ("public")
         }
     }
 }
