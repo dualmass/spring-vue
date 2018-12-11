@@ -44,12 +44,16 @@ val springBootVersion = "2.1.0.RELEASE"
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf:$springBootVersion")
-//    implementation( "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
-    implementation("org.projectlombok:lombok:1.16.22")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion")
+    implementation("org.projectlombok:lombok:1.18.4")
+
     runtime("org.springframework.boot:spring-boot-devtools:$springBootVersion")
+    runtime("com.h2database:h2:1.4.197")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitJupiterEngineVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterEngineVersion")
+
 }
 
 configure<JavaPluginConvention> {
@@ -63,4 +67,5 @@ configure<DependencyManagementExtension> {
     }
 }
 
-apply(from = "tasks.gradle.kts")
+apply(from = "serverTasks.gradle.kts")
+

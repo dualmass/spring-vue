@@ -27,32 +27,41 @@ dependencies { }
 tasks {
     val backendFolder = "../backend"
 
-    val npmRunServe by registering(Exec::class) {
+    val npmRun by registering(Exec::class) {
         group = "Npm"
         npmExecute("run", "serve")
-        println(">>> `npm INSTALL` is done ")
+        doLast { println(">>> `npm INSTALL` is done ") }
     }
 
     val npmBuild by registering(Exec::class) {
         group = "Npm"
         npmExecute("run", "build")
-        println(">>> `npm run BUILD` is done.")
+        doLast { println(">>> `npm run BUILD` is done.") }
     }
 
-    val npmInstall by existing(NpmTask::class) {
-        finalizedBy(npmBuild); println(">>> `npm INSTALL` is done ")
+    val npmInstall by existing {
+        finalizedBy(npmBuild)     //TODO ( хук не привязан )
+        doLast { println(">>> `npm INSTALL` is done ") }
+    }
+
+    create("magic") {
+        group = "Npm"
+        dependsOn(npmInstall)
+        finalizedBy(npmRun)
+        doLast { println(">>> `npm INSTALL + BUIlD + RUN` is done ") }
     }
 
     val clean by registering(Delete::class) {
         group = "Npm"
-        delete("node"); delete("dist"); delete("node_modules")
+        delete("dist"); delete("target/dist"); delete("$backendFolder/src/main/public"); delete("node_modules");
+        doLast { println(">>> Ok. Cleared <<<") }
     }
 
     val copyToBackendPublic by registering(Copy::class) {
         group = "Dist"
         from(file("dist"))
         into("$backendFolder/public")
-        println(">>> Frontend dist folder succesfully copied. ")
+        doLast { println(">>> Frontend dist folder succesfully copied. ") }
     }
 }
 

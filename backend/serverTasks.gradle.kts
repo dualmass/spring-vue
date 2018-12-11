@@ -1,16 +1,22 @@
 
 description = """ `Backend` tasks """
 
-
 val frontenFolder = "../frontend"
 
 tasks {
+    val installFrontend by registering(Exec::class) {
+        group = "Frontend"
+        npmExecute("npm_install")
+    }
+
     val buildFrontend by registering(Exec::class) {
+        group = "Frontend"
         npmExecute("npmBuild")
     }
 
     val runFrontend by registering(Exec::class) {
-        npmExecute("npmRunServe")
+        group = "Frontend"
+        npmExecute("npmRun")
     }
 
     val jar by existing {
