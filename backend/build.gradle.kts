@@ -5,7 +5,6 @@ import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.
 import org.gradle.internal.impldep.org.junit.platform.launcher.EngineFilter.includeEngines
 
 description = """ `Backend` module """
-//group = "br.com.befullstack.springvue"
 
 plugins {
     base
@@ -16,7 +15,7 @@ plugins {
 }
 
 application {
-    mainClassName = "br.com.befullstack.springvue.backend.BackendApplication"
+    mainClassName = "ru.steklopod.BackendApplication"
 }
 
 buildscript {
@@ -64,49 +63,4 @@ configure<DependencyManagementExtension> {
     }
 }
 
-val frontenFolder = "../frontend"
-
-tasks {
-    val buildFrontend by registering(Exec::class) {
-        npmExecute("npmBuild")
-    }
-
-    val runFrontend by registering(Exec::class) {
-        npmExecute("npmRunServe")
-    }
-
-    val jar by existing {
-        dependsOn(buildFrontend)
-        copy {
-            from(file("$frontenFolder/dist"))
-            into("public")
-        }
-    }
-
-    val bootJar by existing {
-        finalizedBy(runFrontend)
-    }
-
-    withType<ProcessResources> {
-        //TODO
-    }
-
-    getByName<Test>("test") {
-        useJUnitPlatform {
-            includeEngines("junit-jupiter")
-            excludeEngines("junit-vintage")
-        }
-    }
-}
-
-
-fun Exec.npmExecute(vararg commands: String) {
-    val commandsList = listOf("cmd", "/c", "gradle", *commands)
-    val isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
-    with(this) {
-        workingDir(frontenFolder)
-        if (isWindows) commandLine(commandsList)
-        else commandLine(commandsList.drop(2))
-    }
-}
-
+apply(from = "tasks.gradle.kts")
