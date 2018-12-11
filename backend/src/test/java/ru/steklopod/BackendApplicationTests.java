@@ -1,4 +1,4 @@
-package br.com.befullstack.springvue.backend;
+package ru.steklopod;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,4 +1,4 @@
-package br.com.befullstack.springvue.backend.controllers;
+package ru.steklopod.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 
