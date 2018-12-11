@@ -1,8 +1,5 @@
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
-import org.gradle.api.JavaVersion.VERSION_1_8
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.include
-import org.gradle.internal.impldep.org.junit.platform.launcher.EngineFilter.includeEngines
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 description = """ `Backend` module """
 
@@ -12,7 +9,9 @@ plugins {
     application
     id("org.springframework.boot") version "2.1.0.RELEASE"
     id("io.spring.dependency-management") version "1.0.6.RELEASE"
+    id("com.github.johnrengelman.shadow") version "4.0.3"
 }
+apply { plugin("com.github.johnrengelman.shadow") }
 
 application {
     mainClassName = "ru.steklopod.BackendApplication"
@@ -26,6 +25,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
+        classpath("com.github.jengelman.gradle.plugins:shadow:4.0.3")
         classpath("org.springframework.boot:spring-boot-gradle-plugin")
     }
 }
@@ -56,11 +56,6 @@ dependencies {
 
 }
 
-configure<JavaPluginConvention> {
-    sourceCompatibility = VERSION_1_8
-    targetCompatibility = VERSION_1_8
-}
-
 configure<DependencyManagementExtension> {
     imports {
         mavenBom("org.springframework.boot:spring-boot-dependencies:$springBootVersion")
@@ -69,3 +64,19 @@ configure<DependencyManagementExtension> {
 
 apply(from = "serverTasks.gradle.kts")
 
+val frontenFolder = "../frontend"
+
+tasks {
+    withType<ShadowJar> {
+        html@ //imperceptiblethoughts.com/shadow/getting-started/#default-java-groovy-tasks
+        enabled = false
+        baseName = "admin-cache"
+        classifier = ""
+        version = ""
+        minimize()
+//        distributions( from("public") )
+        html@ //github.com/johnrengelman/shadow/tree/master/src/docs/configuration/merging
+        mergeServiceFiles()
+    }
+    
+}
