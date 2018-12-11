@@ -64,33 +64,15 @@ configure<DependencyManagementExtension> {
     }
 }
 
-sourceSets {
-    main {
-        java {
-            setSrcDirs(listOf("src/main/java"))
-        }
-        resources {
-            setSrcDirs(listOf("src/main/resources"))
-        }
-    }
-}
+val frontenFolder = "../frontend"
 
 tasks {
-    val frontenFolder = "../frontend"
-    
     val buildFrontend by registering(Exec::class) {
-        val gradleCommandFromFrontendModule = "npmRunServe"
-        workingDir(frontenFolder)
-        if (System.getProperty("os.name").toLowerCase().contains("windows"))
-            commandLine("cmd", "/c", "gradle", gradleCommandFromFrontendModule)
-        else commandLine("gradle", gradleCommandFromFrontendModule)
+        npmExecute("npmBuild")
     }
 
-    getByName<Test>("test") {
-        useJUnitPlatform {
-            includeEngines("junit-jupiter")
-            excludeEngines("junit-vintage")
-        }
+    val runFrontend by registering(Exec::class) {
+        npmExecute("npmRunServe")
     }
 
     val jar by existing {
@@ -101,5 +83,30 @@ tasks {
         }
     }
 
+    val bootJar by existing {
+        finalizedBy(runFrontend)
+    }
+
+    withType<ProcessResources> {
+        //TODO
+    }
+
+    getByName<Test>("test") {
+        useJUnitPlatform {
+            includeEngines("junit-jupiter")
+            excludeEngines("junit-vintage")
+        }
+    }
+}
+
+
+fun Exec.npmExecute(vararg commands: String) {
+    val commandsList = listOf("cmd", "/c", "gradle", *commands)
+    val isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
+    with(this) {
+        workingDir(frontenFolder)
+        if (isWindows) commandLine(commandsList)
+        else commandLine(commandsList.drop(2))
+    }
 }
 
