@@ -27,27 +27,24 @@ dependencies { }
 tasks {
     val backendFolder = "../backend"
 
-    val npmRun by registering(Exec::class) {
+    val run by creating(Exec::class) {
         group = "Npm"
-        npmExecute("run", "serve")
+        npmRun("serve")
         doLast { println(">>> `npm INSTALL` is done ") }
     }
 
-    val npmBuild by registering(Exec::class) {
+    val npmBuild by creating(Exec::class) {
         group = "Npm"
-        npmExecute("run", "build")
+        npmRun("build")
         doLast { println(">>> `npm run BUILD` is done.") }
     }
 
-    val npmInstall by existing {
-        finalizedBy(npmBuild)     //TODO ( хук не привязан )
-        doLast { println(">>> `npm INSTALL` is done ") }
-    }
+    withType<NpmTask> { finalizedBy(npmBuild) }
 
     create("magic") {
         group = "Npm"
         dependsOn(npmInstall)
-        finalizedBy(npmRun)
+        finalizedBy(run)
         doLast { println(">>> `npm INSTALL + BUIlD + RUN` is done ") }
     }
 
@@ -68,8 +65,8 @@ tasks {
 node { download = false } //TODO ( true - если не установлен npm )
 
 
-fun Exec.npmExecute(vararg commands: String) {
-    val commandsList = listOf("cmd", "/c", "npm", *commands)
+fun Exec.npmRun(vararg commands: String) {
+    val commandsList = listOf("cmd", "/c", "npm", "run", *commands)
     val isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
     with(this) {
         if (isWindows) commandLine(commandsList)

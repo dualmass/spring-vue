@@ -1,24 +1,21 @@
-
 description = """ `Backend` tasks """
 
 val frontenFolder = "../frontend"
 
 tasks {
     val installFrontend by registering(Exec::class) {
-        group = "Frontend"
-        npmExecute("npm_install")
+        npmExecute("npm_install"); group = "Frontend"
     }
 
     val buildFrontend by registering(Exec::class) {
-        group = "Frontend"
-        npmExecute("npmBuild")
+        npmExecute("npmBuild"); group = "Frontend"
     }
 
     val runFrontend by registering(Exec::class) {
-        group = "Frontend"
-        npmExecute("npmRun")
+        npmExecute("run"); group = "Frontend"
     }
 
+    //TODO ( проверить )
     val jar by existing {
         dependsOn(buildFrontend)
         copy {
@@ -27,7 +24,8 @@ tasks {
         }
     }
 
-    val bootJar by existing {
+    //TODO ( проверить )
+    getByName("bootRun") {
         finalizedBy(runFrontend)
     }
 
