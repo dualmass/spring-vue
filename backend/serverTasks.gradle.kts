@@ -1,5 +1,7 @@
 import org.gradle.api.JavaVersion.VERSION_1_8
-
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.include
+import org.gradle.internal.impldep.org.junit.platform.launcher.EngineFilter.includeEngines
 
 description = """ `Backend` tasks """
 
@@ -21,13 +23,23 @@ tasks {
     getByName("bootRun") {
         finalizedBy(runFrontend)
     }
+
     withType<ProcessResources> {
         //TODO
     }
 
-   
+    getByName<Test>("test") {
+        useJUnitPlatform {
+            includeEngines("junit-jupiter")
+            excludeEngines("junit-vintage")
+        }
+    }
 }
 
+configure<JavaPluginConvention> {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
 
 fun Exec.npmExecute(vararg commands: String) {
     val commandsList = listOf("cmd", "/c", "gradle", *commands)
@@ -37,9 +49,4 @@ fun Exec.npmExecute(vararg commands: String) {
         if (isWindows) commandLine(commandsList)
         else commandLine(commandsList.drop(2))
     }
-}
-
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
 }

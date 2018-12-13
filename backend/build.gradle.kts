@@ -1,9 +1,6 @@
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.include
-import org.gradle.internal.impldep.org.junit.platform.launcher.EngineFilter.includeEngines
 
 description = """ `Backend` module """
 
@@ -48,13 +45,13 @@ repositories {
 val springBootVersion = "2.1.1.RELEASE"
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web"){ exclude(module = "spring-boot-starter-tomcat") }
+    implementation("org.springframework.boot:spring-boot-starter-web") { exclude(module = "spring-boot-starter-tomcat") }
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-jetty")
     implementation("org.projectlombok:lombok")
 
-    compile("org.springframework.boot:spring-boot-devtools")
+    runtime("org.springframework.boot:spring-boot-devtools")
     runtime("com.h2database:h2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") { exclude(module = "junit") }
@@ -81,8 +78,6 @@ configure<DependencyManagementExtension> {
 }
 
 
-val frontenFolder = "../frontend"
-
 tasks {
     withType<ShadowJar> {
         html@ //imperceptiblethoughts.com/shadow/getting-started/#default-java-groovy-tasks
@@ -95,17 +90,11 @@ tasks {
         html@ //github.com/johnrengelman/shadow/tree/master/src/docs/configuration/merging
         mergeServiceFiles()
     }
+
     withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = "1.8"
             freeCompilerArgs = listOf("-Xjsr305=strict")
-        }
-    }
-
-    getByName<Test>("test") {
-        useJUnitPlatform {
-            includeEngines("junit-jupiter")
-            excludeEngines("junit-vintage")
         }
     }
 }
