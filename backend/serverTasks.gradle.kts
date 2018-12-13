@@ -1,7 +1,5 @@
 import org.gradle.api.JavaVersion.VERSION_1_8
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.include
-import org.gradle.internal.impldep.org.junit.platform.launcher.EngineFilter.includeEngines
+
 
 description = """ `Backend` tasks """
 
@@ -27,22 +25,7 @@ tasks {
         //TODO
     }
 
-//    //TODO ( проверить )
-//    val jar by existing {
-//        dependsOn(buildFrontend)
-//        copy {
-//            from(file("$frontenFolder/dist"))
-//            into("public")
-//        }
-//    }
-
-
-    getByName<Test>("test") {
-        useJUnitPlatform {
-            includeEngines("junit-jupiter")
-            excludeEngines("junit-vintage")
-        }
-    }
+   
 }
 
 
